@@ -1,0 +1,408 @@
+import React, { useState, useEffect } from 'react';
+
+const App = () => {
+    // Definisi pertanyaan game dengan humor dan nilai stres
+    const questions = [
+        {
+            question: "Oke, semester/tahun ajaran baru dimulai! Kamu/Anda baru saja beli buku teks/modul ajar mahal, eh tiba-tiba ada pengumuman kurikulumnya ganti total. Gimana rasanya?",
+            choices: [
+                { text: "Wih, tantangan baru! Seru nih belajar/ngajar hal-hal fresh. (Stres: 0)", stressValue: 0 },
+                { text: "Duh, kaget sih, tapi yaudahlah, mungkin ada bagusnya juga. Siap-siap minum kopi lagi.", stressValue: 1 },
+                { text: "Buku/modul barusan beli jadi pajangan doang? Fix, butuh healing!", stressValue: 2 },
+                { text: "INI PASTI KONSPIRASI SEMESTA! Uang, waktu, jiwa... melayang!", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Tiba-tiba ada materi yang nggak ada di silabus/rencana ajar awal harus kamu/Anda pelajari/ajarkan. Gimana cara kamu/Anda hadapin 'monster' tak terduga ini?",
+            choices: [
+                { text: "Langsung 'googling' dan nyari di YouTube! Asik juga belajar/ngajarin hal baru.", stressValue: 0 },
+                { text: "Cari temen/rekan sejawat yang ngerti atau ajak diskusi bareng.", stressValue: 1 },
+                { text: "Ngomel-ngomel bentar, terus coba cari sumber belajar/referensi lain deh.", stressValue: 2 },
+                { text: "Panik dan mikir, apa perlu jual ginjal buat ikut bimbel/pelatihan tambahan?", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Dosen/kepala sekolah ngumumin format ujian/penilaian berubah drastis, dari cuma nulis esai jadi presentasi kelompok gede di depan anak kampus/rapat guru. Respon kamu/Anda?",
+            choices: [
+                { text: "Yes! Kesempatan buat pamer skill/inovasi dan kerja bareng tim/kolaborasi.", stressValue: 0 },
+                { text: "Agak syok sih, tapi lumayanlah buat nambah pengalaman.", stressValue: 1 },
+                { text: "Aduh, presentasi/perubahan format lagi? Kapan sih bisa tenang sama satu format aja?", stressValue: 2 },
+                { text: "Mendingan ngumpet di kolong meja sampai pengumuman/rapatnya kelar.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Saking pusingnya, kamu/Anda ketahuan ngobrol sama tanaman hias di kamar tentang beban kurikulum. Kamu/Anda bilang apa ke dia?",
+            choices: [
+                { text: "Tenang, Brokoli. Ini semua bagian dari perjalanan. Kita pasti bisa!", stressValue: 0 },
+                { text: "Brokoli, lihat deh materinya numpuk gini. Kamu ada ide nggak?", stressValue: 1 },
+                { text: "Brokoli, kamu tahu nggak rasanya kayak otak mau meledak?", stressValue: 2 },
+                { text: "Brokoli, kalau aku/saya hilang, tolong bilang dosen/kepala sekolah aku/saya udah berusaha yang terbaik.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Ada mata kuliah/topik baru yang wajib diambil/diajarkan, tapi sama sekali nggak nyambung sama minat/keahlian kamu/Anda. Gimana 'petualangan' ini kamu/Anda sikapi?",
+            choices: [
+                { text: "Anggap aja nambah wawasan/keahlian baru. Siapa tahu jadi suka!", stressValue: 0 },
+                { text: "Hmm, lumayan tantangan sih. Mungkin ada hubungannya sama minat/keahlian lainku.", stressValue: 1 },
+                { text: "Yaudahlah, terpaksa. Semoga cepet kelar dan nggak bikin SKS/beban kerja makin berat.", stressValue: 2 },
+                { text: "Ini pasti karma karena dulu sering nunda tugas/persiapan mengajar.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Kamu/Anda lagi asyik nyusun skripsi/tesis/rencana pembelajaran, eh tiba-tiba ada aturan baru soal format penulisannya/implementasinya yang beda jauh. Apa jurus 'ninja' kamu/Anda?",
+            choices: [
+                { text: "Pelajari formatnya, ini kesempatan bikin karya/pembelajaran yang lebih inovatif.", stressValue: 0 },
+                { text: "Agak sebel sih, tapi demi kelulusan/kualitas pengajaran, yaudah deh.", stressValue: 1 },
+                { text: "Ngomel-ngomel bentar ke temen/rekan, terus terpaksa revisi dari awal.", stressValue: 2 },
+                { text: "Skripsiku/RPP-ku udah kayak nisan. Tinggal nunggu dikubur.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Kurikulum baru ngenalin banyak aplikasi atau *software* baru yang wajib dikuasai. Gimana respon kamu/Anda sama 'senjata' baru ini?",
+            choices: [
+                { text: "Wah, keren! Seneng banget belajar teknologi baru yang berguna.", stressValue: 0 },
+                { text: "Oke, harus nyisihin waktu lebih, tapi bisa nambah skill.", stressValue: 1 },
+                { text: "Mesti download dan belajar dari nol lagi. Kapan sih bisa rebahan?", stressValue: 2 },
+                { text: "Komputerku/Laptop saya udah teriak-teriak minta ampun. RAM-ku/memory saya nangis.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Jadwal kuliah/ngajar kamu/Anda tiba-tiba diacak-acak total gara-gara perubahan kurikulum. Gimana kamu/Anda ngatur 'kapal' kamu/Anda ini?",
+            choices: [
+                { text: "Fleksibel dong! Jadwal bisa diatur dengan mudah.", stressValue: 0 },
+                { text: "Awalnya sih pusing, tapi nanti juga biasa.", stressValue: 1 },
+                { text: "Mesti ngatur ulang semua janji dan acara di luar kampus/sekolah. Ribet!", stressValue: 2 },
+                { text: "Aku/Saya udah lupa rasanya punya jadwal yang stabil. Hidup ini emang *roller coaster*.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Kamu/Anda diminta bikin materi ajar/proyek yang beda banget dari biasanya, sesuai kurikulum baru. Gimana pendekatan kamu/Anda?",
+            choices: [
+                { text: "Suka tantangan! Ini kesempatan buat berkreasi dan jadi inovatif.", stressValue: 0 },
+                { text: "Butuh waktu lebih buat adaptasi, tapi aku/saya bisa kok.", stressValue: 1 },
+                { text: "Ini di luar zona nyaman banget. Semoga nggak terlalu bikin pusing.", stressValue: 2 },
+                { text: "Aku/Saya berasa kayak aktor dadakan disuruh jadi sutradara. Panik!", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Ada pelatihan wajib terkait kurikulum baru, diadain pas liburan kamu/Anda. Gimana respon 'pahlawan' dalam dirimu/diri Anda?",
+            choices: [
+                { text: "Nggak masalah, ini investasi ilmu. Anggap aja *refreshing*.", stressValue: 0 },
+                { text: "Yah, liburan kepotong dikit, tapi kan demi masa depan.", stressValue: 1 },
+                { text: "Liburanku/liburan saya lagi-lagi dikorbanin. Kapan sih bisa maraton drakor/nonton berita kesukaan?", stressValue: 2 },
+                { text: "Aku/Saya bakal pake kostum pahlawan tidur dan dateng ke sana sambil merem.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Dosen/kepala sekolah tiba-tiba ngumumin topik ujian/penilaian minggu depan adalah 'Sejarah Mikroba di Bawah Kaus Kaki Bekas'.",
+            choices: [
+                { text: "Menarik! Tantangan baru buat nguji kemampuan risetku.", stressValue: 0 },
+                { text: "Oke, mungkin ada relevansinya yang tersembunyi. Mari kita cari tahu.", stressValue: 1 },
+                { text: "Ini pasti bercanda. Tapi kalau serius, aku/saya mulai ragu sama kewarasan mereka.", stressValue: 2 },
+                { text: "Kayaknya aku/saya butuh 'detoks' dari dunia pendidikan.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Kamu/Anda harus ngubah semua slide presentasi/modul/RPP mata kuliah/kelas sebelumnya biar sesuai format kurikulum baru. Gimana 'petualangan' ini kamu/Anda hadapi?",
+            choices: [
+                { text: "Anggap aja ini latihan desain ulang. Semangat!", stressValue: 0 },
+                { text: "Lumayan makan waktu, tapi kan buat kualitas presentasi/pembelajaran.", stressValue: 1 },
+                { text: "Kenapa nggak bilang dari awal?! Ini mah sama aja bikin baru!", stressValue: 2 },
+                { text: "Aku/Saya bakal minta PowerPoint/modul saya buat bunuh diri secara profesional.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Kamu/Anda lihat temen/rekan sejawatmu panik gara-gara perubahan kurikulum. Apa yang kamu/Anda lakuin?",
+            choices: [
+                { text: "Nawarin bantuan, jelasin dengan tenang, dan kasih semangat.", stressValue: 0 },
+                { text: "Nenangin mereka, tapi dalam hati ikut cemas dikit.", stressValue: 1 },
+                { text: "Ikut ngiyain keluhan mereka dan ikutan ngedumel.", stressValue: 2 },
+                { text: "Lari jauh-jauh sebelum kepanikan mereka nular ke aku/saya.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Ada sumber belajar baru yang diwajibkan, tapi isinya padat dan kompleks banget. Gimana kamu/Anda 'menaklukkan' gunung ilmu ini?",
+            choices: [
+                { text: "Seneng! Makin menantang makin seru buat dipelajari.", stressValue: 0 },
+                { text: "Memang butuh fokus ekstra, tapi aku/saya siap kok.", stressValue: 1 },
+                { text: "Ini mah bukan belajar, ini maraton membaca tanpa istirahat!", stressValue: 2 },
+                { text: "Kayaknya aku/saya butuh kacamata kuda sama headset peredam suara.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Kamu/Anda harus adaptasi sama sistem penilaian baru yang lebih ribet. Gimana 'strategi perang' kamu/Anda?",
+            choices: [
+                { text: "Pelajari sistemnya, cari celahnya, terus maksimalkan nilai!", stressValue: 0 },
+                { text: "Agak bikin bingung sih, tapi aku/saya bakal coba pahami baik-baik.", stressValue: 1 },
+                { text: "Ini cuma bikin pusing dan buang waktu. Kenapa harus diubah sih?", stressValue: 2 },
+                { text: "Aku/Saya ngerasa lagi main *roulette* di kasino akademik/sekolah.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Waktu buat santai kamu/Anda berkurang drastis gara-gara tuntutan kurikulum yang berubah terus. Apa reaksi 'jiwa' kamu/Anda?",
+            choices: [
+                { text: "Aku/Saya bisa kok ngatur waktu lebih efisien.", stressValue: 0 },
+                { text: "Dikit sedih sih, tapi yaudahlah ini fase yang harus dilewatin.", stressValue: 1 },
+                { text: "Aku/Saya mulai lupa rasanya 'santai'. Siapa itu 'Netflix'?", stressValue: 2 },
+                { text: "Kesehatan mental saya lagi ngirim sinyal bahaya nih.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Ada tugas/proyek kolaborasi lintas disiplin yang wajib gara-gara kurikulum baru. Gimana kamu/Anda hadapin 'persimpangan' ini?",
+            choices: [
+                { text: "Menarik! Kesempatan ketemu orang baru dan belajar sudut pandang lain.", stressValue: 0 },
+                { text: "Lumayan tantangan buat nyatuin ide, tapi aku/saya bakal coba.", stressValue: 1 },
+                { text: "Nambah-nambahin beban koordinasi aja. Ribet!", stressValue: 2 },
+                { text: "Aku/Saya lebih suka ngobrol sama kucingku daripada orang lain sekarang.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Dosen/instruktur baru yang ngajar materi kurikulum baru punya gaya ngajar yang beda banget dari yang kamu/Anda kira. Gimana kamu/Anda adaptasinya?",
+            choices: [
+                { text: "Coba pahami dan nikmati gaya baru mereka. Siapa tahu efektif.", stressValue: 0 },
+                { text: "Awalnya agak kagok sih, tapi aku/saya bakal nyocokin diri.", stressValue: 1 },
+                { text: "Mesti adaptasi lagi? Kenapa hidup ini penuh kejutan?", stressValue: 2 },
+                { text: "Aku/Saya berasa kayak anak baru di hari pertama sekolah, tiap semester/tahun ajaran.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Kamu/Anda harus masukin hasil riset terbaru ke materi ajar/proyek kamu/Anda sesuai update kurikulum. Apa 'jurus rahasia' kamu/Anda?",
+            choices: [
+                { text: "Aku/Saya suka riset! Ini kesempatan buat nambah ilmu pengetahuan.", stressValue: 0 },
+                { text: "Butuh waktu buat baca dan pahami, tapi ini penting.", stressValue: 1 },
+                { text: "Nambah-nambahin bacaan lagi. Kapan istirahatnya?", stressValue: 2 },
+                { text: "Aku/Saya udah punya tumpukan riset yang belum kepegang. Tolong.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Tiba-tiba ada perubahan syarat kelulusan/sertifikasi/kenaikan pangkat yang nyambung sama kurikulum baru. Gimana respon kamu/Anda sama 'rintangan terakhir' ini?",
+            choices: [
+                { text: "Analisis syaratnya, bikin strategi, dan taklukkan!", stressValue: 0 },
+                { text: "Agak bikin dag-dig-dug sih, tapi aku/saya bakal berusaha.", stressValue: 1 },
+                { text: "Kenapa harus diubah pas udah mau lulus/pensiun sih?! Ini nggak adil!", stressValue: 2 },
+                { text: "Aku/Saya mau tidur aja sampai semua ini kelar.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Kamu/Anda lagi asyik liburan singkat, eh tiba-tiba email dari kampus/lembaga ngasih tahu perubahan kurikulum gede-gedean yang bakal dateng. Respon kamu/Anda?",
+            choices: [
+                { text: "Oke, dicatat. Nanti cek detailnya abis liburan.", stressValue: 0 },
+                { text: "Agak mikir keras sih, tapi ini udah jadi bagian dari hidup.", stressValue: 1 },
+                { text: "Liburanku/liburan saya hancur! Kenapa email ini nggak bisa nunggu sih?!", stressValue: 2 },
+                { text: "Aku/Saya bakal pura-pura email itu nggak pernah ada dan lanjut nikmatin es kelapa.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Kurikulum baru nekenin 'soft *skills*' yang sebelumnya kamu/Anda kurang jago. Gimana kamu/Anda 'upgrade diri'?",
+            choices: [
+                { text: "Sangat antusias! Ini area yang emang pengen aku/saya kembangin.", stressValue: 0 },
+                { text: "Butuh latihan, tapi aku/saya bakal coba belajar dari buku atau video.", stressValue: 1 },
+                { text: "Aduh, harus belajar hal di luar akademis lagi? Capek banget!", stressValue: 2 },
+                { text: "Aku/Saya berasa kayak alien yang lagi nyoba ngertiin bahasa manusia.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Ada proyek akhir semester/tahun ajaran yang formatnya dirombak total gara-gara kurikulum baru. Tim kamu/Anda mulai panik. Gimana kamu/Anda mimpin 'ekspedisi' ini?",
+            choices: [
+                { text: "Tenang, kita analisis perubahannya dan bikin strategi baru bareng.", stressValue: 0 },
+                { text: "Agak susah emang, tapi kita pasti bisa nemuin solusinya.", stressValue: 1 },
+                { text: "Oke, tapi aku/saya udah siap sama 'Plan B' kalau ini gagal total.", stressValue: 2 },
+                { text: "Aku/Saya bakal pura-pura pingsan biar mereka yang ngurusin.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Kamu/Anda harus nyari referensi baru yang cocok sama perubahan kurikulum, dan referensi lama udah nggak relevan. Gimana 'perburuan harta karun' ini?",
+            choices: [
+                { text: "Seru! Nemu referensi baru berarti nambah ilmu pengetahuan.", stressValue: 0 },
+                { text: "Lumayan PR, tapi kan demi kualitas materi.", stressValue: 1 },
+                { text: "Daftar referensiku/referensi saya udah numpuk, ini nambah daftar panjang!", stressValue: 2 },
+                { text: "Kayaknya pustakawan/staf perpustakaan udah hafal muka frustrasiku/saya.", stressValue: 3 }
+            ]
+        },
+        {
+            question: "Setelah semua perubahan, kamu/Anda lihat hasil belajar/ngajar kamu/Anda. Apa refleksi kamu/Anda tentang 'perjalanan' kurikulum ini?",
+            choices: [
+                { text: "Menantang, tapi sangat memuaskan dan banyak belajar hal baru.", stressValue: 0 },
+                { text: "Ada suka dan duka, tapi aku/saya tumbuh dari pengalaman ini.", stressValue: 1 },
+                { text: "Capek banget, tapi syukurlah udah selesai. Semoga nggak ada perubahan lagi dalam waktu dekat.", stressValue: 2 },
+                { text: "Aku/Saya butuh istirahat seabad. Mungkin pensiun dini dari dunia kurikulum.", stressValue: 3 }
+            ]
+        }
+    ];
+
+    // Status permainan: 'start', 'quiz', 'result'
+    const [currentScreen, setCurrentScreen] = useState('start');
+    // Indeks pertanyaan yang sedang ditampilkan
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    // Total skor stres yang terkumpul
+    const [totalStressScore, setTotalStressScore] = useState(0);
+    // Array untuk menyimpan jawaban yang dipilih (untuk validasi)
+    const [selectedAnswers, setSelectedAnswers] = useState(Array(questions.length).fill(null));
+
+    // Fungsi untuk memulai game
+    const startGame = () => {
+        setCurrentScreen('quiz');
+        setCurrentQuestionIndex(0);
+        setTotalStressScore(0);
+        setSelectedAnswers(Array(questions.length).fill(null)); // Reset jawaban
+    };
+
+    // Fungsi untuk menangani pilihan jawaban
+    const handleAnswer = (stressValue, questionIndex) => {
+        // Buat salinan array jawaban
+        const newSelectedAnswers = [...selectedAnswers];
+        // Simpan stressValue untuk pertanyaan ini
+        newSelectedAnswers[questionIndex] = stressValue;
+        setSelectedAnswers(newSelectedAnswers);
+    };
+
+    // Fungsi untuk melanjutkan ke pertanyaan berikutnya atau menampilkan hasil
+    const nextQuestion = () => {
+        // Validasi apakah jawaban sudah dipilih untuk pertanyaan saat ini
+        if (selectedAnswers[currentQuestionIndex] === null) {
+            // Ini akan muncul sebagai pesan di UI atau bisa juga dengan alert sederhana jika di web biasa
+            alert("Pilih jawaban dulu ya!");
+            return;
+        }
+
+        // Jika ini bukan pertanyaan terakhir, lanjutkan ke pertanyaan berikutnya
+        if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex(prevIndex => prevIndex + 1);
+        } else {
+            // Jika ini pertanyaan terakhir, hitung total skor dan tampilkan hasil
+            const finalScore = selectedAnswers.reduce((sum, score) => sum + score, 0);
+            setTotalStressScore(finalScore);
+            setCurrentScreen('result');
+        }
+    };
+
+    // Fungsi untuk memulai ulang game
+    const restartGame = () => {
+        setCurrentScreen('start');
+        setCurrentQuestionIndex(0);
+        setTotalStressScore(0);
+        setSelectedAnswers(Array(questions.length).fill(null));
+    };
+
+    // Fungsi untuk mendapatkan deskripsi tingkat stres berdasarkan skor
+    const getStressLevel = (score) => {
+        if (score >= 0 && score <= 15) {
+            return {
+                title: "Zen Master Kurikulum! 🧘‍♂️✨",
+                description: "Wuih! Kamu/Anda tenang banget kayak air di danau pas perubahan kurikulum. Perubahan itu kayak sarapan pagi buat kamu/Anda, dihadapi dengan senyum. Tetap kalem ya, Master!"
+            };
+        } else if (score >= 16 && score <= 30) {
+            return {
+                title: "Kapten Kurikulum Santai! ⛵️",
+                description: "Kamu/Anda lumayan santai ngadepin ombak kurikulum. Ada sih riak-riak kecil, tapi kamu/Anda masih bisa berlayar dengan tenang. Jaga terus keseimbanganmu/Anda!"
+            };
+        } else if (score >= 31 && score <= 45) {
+            return {
+                title: "Pejuang Kurikulum Optimis! 💪",
+                description: "Kamu/Anda ngerasain tantangan, tapi semangat optimis kamu/Anda nggak goyah. Kamu/Anda tahu cara bangkit dan terus maju, meskipun ada rintangan kurikulum. Gas terus!"
+            };
+        } else if (score >= 46 && score <= 60) {
+            return {
+                title: "Penjelajah Kurikulum Bergelombang! 🌊",
+                description: "Ombak kurikulum mulai berasa gede nih. Kamu/Anda mungkin mulai ngerasa tekanan dan sedikit capek. Inget ya, sesekali istirahat, cari 'pelabuhan' buat ngadem."
+            };
+        } else { // score >= 61
+            return {
+                title: "Alarm Kurikulum Krisis! 🚨",
+                description: "Kamu/Anda udah di batas stres kurikulum! Rasanya pengen teriak atau kabur ke pulau antah berantah. Ini waktunya cari bantuan, atau minimal, liburan panjang tanpa internet!"
+            };
+        }
+    };
+
+    // Render layar utama
+    const renderStartScreen = () => (
+        <div className="text-center p-6 md:p-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl text-white shadow-xl">
+            <div className="mb-4 text-6xl">
+                🧠💡
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-3 leading-tight">KURIKULUM SIAGA</h1>
+            <p className="font-bold mb-4 text-xl">Stres Anda Gimana, Bestie? 🚀</p>
+            <p className="text-blue-200 text-base mb-6">
+                SIAGA: Survei Interaktif Analisis Gangguan Akademis
+            </p>
+            <p className="text-blue-100 mb-8 text-lg md:text-xl leading-relaxed">
+                Selamat datang di petualangan seru ini! Game ini pas banget buat mahasiswa dan guru muda yang lagi semangat-semangatnya, sampai Bapak/Ibu guru senior yang udah puluhan tahun ngajar dan mungkin udah mikir mau pensiun. Yuk, cari tahu seberapa 'bestie' kamu/Anda sama perubahan kurikulum dan gimana cara kamu/Anda ngadepinnya. Siap?
+            </p>
+            <button
+                onClick={startGame}
+                className="mt-6 w-full md:w-2/3 bg-white text-blue-700 py-4 px-8 btn hover:bg-blue-100 font-bold text-xl shadow-lg transform hover:scale-105 transition-all duration-300"
+            >
+                Mulai Petualangan!
+            </button>
+        </div>
+    );
+
+    // Render layar kuis (pertanyaan)
+    const renderQuizScreen = () => {
+        const currentQ = questions[currentQuestionIndex];
+        return (
+            <div className="text-left">
+                <p className="text-sm text-gray-500 mb-4 text-center">
+                    Pertanyaan {currentQuestionIndex + 1} dari {questions.length}
+                </p>
+                <div className="mb-6 p-4 bg-blue-50 card">
+                    <p className="text-xl font-semibold text-gray-700 mb-4">{currentQ.question}</p>
+                    <div className="space-y-3">
+                        {currentQ.choices.map((choice, idx) => (
+                            <label key={idx} className="radio-label">
+                                <input
+                                    type="radio"
+                                    name={`question-${currentQuestionIndex}`}
+                                    value={choice.stressValue}
+                                    checked={selectedAnswers[currentQuestionIndex] === choice.stressValue}
+                                    onChange={() => handleAnswer(choice.stressValue, currentQuestionIndex)}
+                                    required
+                                />
+                                <span>{choice.text}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+                <button
+                    onClick={nextQuestion}
+                    className="mt-8 w-full bg-blue-600 text-white py-3 px-6 btn hover:bg-blue-700 font-semibold text-lg"
+                >
+                    {currentQuestionIndex === questions.length - 1 ? 'Lihat Hasil Stresku!' : 'Lanjut ke Pertanyaan Berikutnya'}
+                </button>
+            </div>
+        );
+    };
+
+    // Render layar hasil
+    const renderResultScreen = () => {
+        const { title, description } = getStressLevel(totalStressScore);
+        return (
+            <div className="mt-10 p-6 md:p-8 bg-green-50 card">
+                <h2 className="text-2xl md:text-3xl font-bold text-green-800 mb-4">Hasil Tingkat Stres Kurikulum Kamu/Anda:</h2>
+                <div className="text-green-700 text-lg md:text-xl leading-relaxed">
+                    <h3 className="text-xl md:text-2xl font-bold mb-2">{title}</h3>
+                    <p>{description}</p>
+                    <p className="mt-4 text-base text-gray-600">Total skor stres kamu/Anda: <span className="font-bold text-blue-800">{totalStressScore}</span></p>
+                </div>
+                <button
+                    onClick={restartGame}
+                    className="mt-6 w-full bg-gray-500 text-white py-3 px-6 btn hover:bg-gray-600 font-semibold text-md"
+                >
+                    Ulangi Petualangan
+                </button>
+            </div>
+        );
+    };
+
+    return (
+        <div className="flex items-center justify-center min-h-screen p-4 bg-blue-100">
+            <div className="bg-white card max-w-2xl w-full p-8 md:p-12">
+                {currentScreen === 'start' && renderStartScreen()}
+                {currentScreen === 'quiz' && renderQuizScreen()}
+                {currentScreen === 'result' && renderResultScreen()}
+            </div>
+        </div>
+    );
+};
+
+export default App;
